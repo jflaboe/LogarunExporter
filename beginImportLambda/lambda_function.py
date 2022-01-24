@@ -18,9 +18,48 @@ def create_request(request_data, strava_account):
     dates = [dt.strftime("%m/%d/%Y") for dt in daterange(request_data["startDate"], request_data["endDate"])]
     req_id = id_generator()
     #create user level data
-
+    update_expression = "ADD" + " requests :c"
+    expression_attribute_values = {
+        ":c":{
+            "SS": [req_id]
+        }
+    }
+    dynamo.update_item(
+        TableName='Users_LogarunToStrava',
+        Key={
+            'sid': {
+                'S': strava_account["id"]
+            }
+        },
+        UpdateExpression=update_expression,
+        ExpressionAttributeValues=expression_attribute_values)
     #create request
-    
+    update_expression = "SET" + " dates :c"
+    expression_attribute_values = {
+        ":c":{
+            "M": {
+                d: {
+                    "M": {
+                        "Complete": {
+                            "B": False
+                        },
+                        "Retries": {
+                            "N" : 0
+                        }
+                    }
+                } for d in dates
+            }
+        }
+    }
+    dynamo.update_item(
+        TableName='Users_LogarunToStrava',
+        Key={
+            'rid': {
+                'S': req_id
+            }
+        },
+        UpdateExpression=update_expression,
+        ExpressionAttributeValues=expression_attribute_values)
 
     #upload to sqs
     
@@ -50,7 +89,6 @@ def upload_to_sqs(obj):
             }
         }
     )
-
 
 def daterange(start_date, end_date):
     start_date = datetime.strptime(start_date, "%m/%d/%Y")
@@ -93,3 +131,10 @@ def lamdba_handler(event, context):
         }
     
     request_id = create_request(request_data, strava_account)
+
+    return {
+        "code": 200,
+        "body": json.dumps({
+            "requestId": request_id
+        })
+    }
