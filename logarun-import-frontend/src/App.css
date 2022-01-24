@@ -1,0 +1,146 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.logarun-import-form {
+  padding-bottom: 2vh;
+}
+
+
+
+.logarun-import-form-explain {
+  align-self: center;
+  border: 1px solid #697E47;
+  background-color: rgb(255,255,228);
+  font-family: Tahoma, Arial, Helvetica;
+  
+  text-align: left;
+  padding: 2vw;
+  align-self: stretch;
+}
+
+.logarun {
+  border: 1px solid #697E47;
+  background-color: rgb(255,255,228);
+  font-family: Tahoma, Arial, Helvetica;
+  font-size: 0.8em;
+}
+
+.header {
+  height: 5vh;
+  background-image: linear-gradient(to right, #697E47, #697E47 30%, #fc4c02 70%, #fc4c02);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.error {
+  color: red;
+}
+
+.header-logarun-logo {
+  align-self: center;
+  justify-self: start;
+  margin-left: 3vh;
+}
+
+.header-strava-logo {
+  align-self: center;
+  justify-self: end;
+  margin-right: 3vh;
+
+} 
+
+#help-button {
+  text-align: center;
+}
+
+img {
+  height: 4vh;
+}
+
+.import-form-button button {
+  font-family: Tahoma, Arial, Helvetica;
+  padding: 5px;
+}
+
+input[type=text] {
+  width: 70%;
+  padding: 6px 6px;
+  margin: 6px 0;
+  box-sizing: border-box;
+}
+
+.import-form-text {
+  margin: 2vh;
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+}
+
+.import-form-text div {
+  align-self: center;
+}
+
+@media (min-width: 601px) {
+  
+
+  .logarun-import {
+    margin: 2vh;
+    display: grid;
+    justify-items: stretch;
+    grid-template-columns: 1fr 1fr;
+    gap: 2vw;
+    align-items: start;
+  }
+
+}
+
+@media (max-width: 600px) {
+  .header {
+    background-image: linear-gradient(to right, #697E47, #697E47 45%, #fc4c02 55%, #fc4c02);;
+  }
+
+  .logarun-import {
+    height: 50vh;
+    margin: 2vh;
+    display: grid;
+    grid-template-rows: auto;
+    gap: 2vh;
+    
+  }
+ 
+}

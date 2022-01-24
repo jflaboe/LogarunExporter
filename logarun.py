@@ -86,6 +86,36 @@ class API:
         resp = self.session.get(url, timeout=30)
         resp.raise_for_status()
         return LogarunDay(resp.content)
+    
+    def user_exists(self):
+        resp = self.session.get(BASE_URL + "xml.aspx?username={}&type=General".format(self.username))
+        try:
+            resp.raise_for_status()
+            soup = BeautifulSoup(resp.content)
+        except:
+            return False
+        has_activities = True
+        try:
+            activities = soup.find(attrs={"name": "Activities"}).find_all("item")
+            if len(activities) < 1:
+                has_activities = False
+        except:
+                has_activities = False
+
+        has_runs = True
+        try:
+            names = soup.find_all("name")
+            for n in names:
+                if "Days Run" in n:
+                    if n.find_next_sibling().text == "0":
+                        has_runs = False
+        except:
+            has_runs = False
+        
+        if has_activities or has_runs:
+            return True
+
+        return False
 
 
     def get_date_range(self, date1, date2, on_add=lambda *args: None, on_complete=lambda *args: None, wait_for_completion=True):
@@ -118,7 +148,7 @@ class API:
                 #update results
                 r.add_value( (dt, i) )
             jobs.sort()
-            
+
         threads = []
         dates = [dt.strftime("%m/%d/%Y") for dt in daterange(date1, date2)]
         response = APIDateRangeResponse(len(dates), on_add, on_complete)
