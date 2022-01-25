@@ -18,17 +18,26 @@ def create_request(request_data, strava_account):
     dates = [dt.strftime("%m/%d/%Y") for dt in daterange(request_data["startDate"], request_data["endDate"])]
     req_id = id_generator()
     #create user level data
-    update_expression = "ADD" + " requests :c"
+    update_expression = "ADD requests = :c, SET access_token = :a, refresh_token = :r, expires_at = :e"
     expression_attribute_values = {
         ":c":{
             "SS": [req_id]
+        },
+        ":a": {
+            "S": strava_account['access_token']
+        },
+        ":r": {
+            "S": strava_account['refresh_token']
+        },
+        ":e": {
+            "S": strava_account["expires_at"]
         }
     }
     dynamo.update_item(
         TableName='Users_LogarunToStrava',
         Key={
             'sid': {
-                'S': strava_account["id"]
+                'S': strava_account["athlete"]["id"]
             }
         },
         UpdateExpression=update_expression,
