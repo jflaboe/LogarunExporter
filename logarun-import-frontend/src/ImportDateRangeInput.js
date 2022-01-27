@@ -20,7 +20,7 @@ export default function ImportDateRangeInput(props) {
     const startImport = () => {
         setLoadingImport(true);
         var authData = StravaAuth.getAuthData();
-        fetch("https://strava.laboe.org/import", {
+        fetch(process.env.REACT_APP_IMPORT_URL, {
             method: "POST",
             body: JSON.stringify({
                 "username": username,
@@ -35,7 +35,17 @@ export default function ImportDateRangeInput(props) {
             })
         }).then(function(response) {
             if (!response.ok) {
+                console.log(response)
                 setLoadingImport(false)
+            }
+            return response.json()
+        }).then(data => {
+            if (data.success) {
+                console.log("succeeded")
+            } else {
+                if (data.reason === "strava-account-verification-failed") {
+                    StravaAuth.redirectToAuth();
+                }
             }
         })
     }

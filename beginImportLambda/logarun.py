@@ -15,7 +15,7 @@ ONE_DAY = 60 * 60 * 24 #seconds
 class LogarunDay:
     def __init__(self, html):
         self.informatics = {}
-        soup = BeautifulSoup(html, 'html.parser')
+        soup = BeautifulSoup(html, features='html.parser')
         title = soup.find(id = "ctl00_Content_c_dayTitle_c_title").text
         
         #handle title

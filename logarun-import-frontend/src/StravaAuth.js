@@ -32,5 +32,9 @@ export default class StravaAuth {
         }
     }
 
+    static redirectToAuth() {
+        window.location.href = "https://www.strava.com/oauth/authorize?client_id=29352&redirect_uri=" + window.location.origin + "&response_type=code&scope=activity:write,read";
+    }
+
 
 }

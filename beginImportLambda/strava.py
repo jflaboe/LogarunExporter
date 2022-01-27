@@ -2,7 +2,7 @@ import requests
 import json
 import os
 
-AUTH_URL = "https://www.strava.com/api/v3/oauth/token"
+AUTH_URL = "https://www.strava.com/oauth/token"
 ACTIVITIES_URL = "https://www.strava.com/api/v3/athlete/activities"
 
 
