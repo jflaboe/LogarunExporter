@@ -18,8 +18,9 @@ export default class StravaAuth {
         
         if (params.code) {
             storage.setItem("code", params.code)
-            
             storage.setItem("auth-time", (new Date()).getTime())
+            let newurl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+            window.history.pushState({path:newurl},'',newurl);
         }
         
     }

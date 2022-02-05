@@ -52,7 +52,7 @@ export default function ImportDateRangeInput(props) {
 
     const getHelp = () => {
         setAskedForHelp(true);
-        fetch("https://strava.laboe.org/help", {
+        fetch(process.env.REACT_APP_HELP_URL, {
             method: "POST",
             body: JSON.stringify({
                 "email": email,
@@ -96,7 +96,7 @@ export default function ImportDateRangeInput(props) {
         <div className="logarun-import">
             <div className="logarun-import-form logarun">
                 <div className="import-form-username import-form-text">
-                    <div className={username == "" ? "error" : ""}>Logarun Username</div>
+                    <div className={username === "" ? "error" : ""}>Logarun Username</div>
                     <div>
                         <input type="text"name="username" value={username} onChange={updateField} />
                     </div>

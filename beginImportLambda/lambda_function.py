@@ -113,6 +113,12 @@ def verify_logarun_account(request_data):
     api = logarun.API(username=request_data['username'], password=password)
     return api.user_exists()
 
+def check_for_account(request_data):
+    if "lastRequest" in request_data:
+        return None
+    else:
+        return None
+
 def lambda_handler(event, context):
     
     request_data = get_request_data(event)
@@ -132,7 +138,9 @@ def lambda_handler(event, context):
                 "Access-Control-Allow-Origin": "*"
             }
         }
-    strava_account = get_strava_account(request_data)
+    strava_account = check_for_account(request_data)
+    if strava_account is None:
+        strava_account = get_strava_account(request_data)
     print("STRAVA ACCOUNT {}".format(strava_account))
     if strava_account is None or not 'access_token' in strava_account:
         return {
@@ -154,7 +162,8 @@ def lambda_handler(event, context):
         "code": 200,
         "body": json.dumps({
             "success": True,
-            "requestId": request_id
+            "requestId": request_id,
+            "sid": strava_account["athlete"]["id"]
         }),
         "headers": {
             "Access-Control-Allow-Methods": "*",
