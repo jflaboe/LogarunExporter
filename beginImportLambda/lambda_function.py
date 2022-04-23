@@ -19,10 +19,25 @@ def create_request(request_data, strava_account):
     dates = [dt.strftime("%m/%d/%Y") for dt in daterange(request_data["startDate"], request_data["endDate"])]
     req_id = id_generator()
     #create user level data
-    update_expression = "ADD requests :c SET access_token = :a, refresh_token = :r, expires_at = :e"
+    update_expression = "SET access_token = :a, refresh_token = :r, expires_at = :e, requests = list_append(if_not_exists(requests, :empty_list), :c)"
     expression_attribute_values = {
         ":c":{
-            "SS": [req_id]
+            "L": [{
+                "M": {
+                    "rid": {
+                        "S": req_id
+                    },
+                    "start": {
+                        "S": request_data["startDate"]
+                    },
+                    "end": {
+                        "S": request_data["endDate"]
+                    }
+                }
+            }]
+        },
+        ":empty_list": {
+            "L" :[]
         },
         ":a": {
             "S": strava_account['access_token']
@@ -44,7 +59,7 @@ def create_request(request_data, strava_account):
         UpdateExpression=update_expression,
         ExpressionAttributeValues=expression_attribute_values)
     #create request
-    update_expression = "SET" + " dates = :c"
+    update_expression = "SET dates = :c, sid = :b"
     expression_attribute_values = {
         ":c":{
             "M": {
@@ -59,6 +74,9 @@ def create_request(request_data, strava_account):
                     }
                 } for d in dates
             }
+        },
+        ":b": {
+            "S": strava_account["athlete"]["id"]
         }
     }
     print(expression_attribute_values)

@@ -144,3 +144,22 @@ input[type=text] {
   }
  
 }
+
+.request-dates {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-auto-rows: 10vh;
+  /* how much height must each element occupy! change that! */
+  grid-gap: 1vh;
+  width: 70%;
+  margin: auto;
+  margin-top: 2vh;
+}
+
+.request-date {
+  padding: 3vw;
+  display: grid;
+  grid-template-areas:
+    "date status"
+    "strava strava"
+}
