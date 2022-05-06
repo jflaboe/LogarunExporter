@@ -1,1 +1,1 @@
-{"/import":"beginImportLambda", "/help":"helpLambda", "/request":"getRequestLambda"}
+{"/import":"beginImportLambda", "/help":"helpLambda", "/request":"getRequestLambda", "/user":"getUserLambda"}

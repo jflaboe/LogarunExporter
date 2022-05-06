@@ -8,6 +8,8 @@ def get_data(event):
     return json.loads(event['body'])
 
 def dynamo_to_dict(dynamo_response):
+    print("dynamo")
+    print(dynamo_response)
     def unmarshal(dynamo_map):
         result = {}
         for k, v in dynamo_map.items():
@@ -25,6 +27,7 @@ def dynamo_to_dict(dynamo_response):
     return unmarshal(dynamo_response['Item'])
 
 def get_import_request(data):
+    print(data)
     resp = dynamo.get_item(
         TableName=os.environ["REQUESTS_TABLE_NAME"],
         Key={

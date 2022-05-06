@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ImportDateRangeInput from './ImportDateRangeInput';
 import RequestStatus from './RequestStatus';
+import UserInfo from './UserInfo';
 
 function App() {
   
@@ -27,7 +28,8 @@ function App() {
       </div>
       <BrowserRouter>
         <Routes>
-          <Route path="/viewRequest" element={<RequestStatus />} />
+          <Route path="/request" element={<RequestStatus />} />
+          <Route path="/user" element={<UserInfo />} />
           <Route path="/" element={<ImportDateRangeInput />} />
         </Routes>
       </BrowserRouter>

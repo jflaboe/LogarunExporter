@@ -1,13 +1,13 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function RequestStatus(props) {
     const [request, setRequest] = useState(null);
 
-    useEffect(() => {
+    const refresh = (rid) => {
         fetch(process.env.REACT_APP_REQUEST_URL, {
             method: "POST",
             body: JSON.stringify({
-                "requestId": window.localStorage.getItem("lastRequest")
+                "requestId": rid
             })
         })
         .then(function(response) {
@@ -20,8 +20,24 @@ export default function RequestStatus(props) {
                 console.log(data)
 
                 setRequest(data.data)
+                window.localStorage.setItem("request-" + rid, JSON.stringify(data.data));
             }
         })
+    }
+
+    useEffect(() => {
+        let requestId = window.localStorage.getItem("lastRequest");
+        if (!requestId) {
+            window.location.href = "/user"
+            return;
+        }
+
+        let cachedData = window.localStorage.getItem("request-" + requestId);
+        if (cachedData) {
+            setRequest(JSON.parse(cachedData));
+            return;
+        }
+        refresh(requestId);
     }, []);
     console.log(request)
     let dates = null;
@@ -45,11 +61,20 @@ export default function RequestStatus(props) {
         console.log(dates)
     }
     return (
+        <React.Fragment>
+        <div className="request-status">
+            <div className="is-request-complete">
+                {request && request.completed && request.completed === dates.length ? "Status: Complete" : "Status: In Progress"}
+            </div>
+            <div className="refresh" onClick={()=>{refresh(window.localStorage.getItem("lastRequest"))}}>Refresh</div>
+        </div>
         <div className="request-dates">
             {dates && dates.map((v, i) => {
                 return (<LogarunDayStatus key={v.date} complete={v.Complete} activities={v.Activities} date={v.date} />)
-            })}
-        </div>
+        })}
+        </div>  
+        </React.Fragment>
+        
     )
 }
 

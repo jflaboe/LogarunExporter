@@ -41,7 +41,10 @@ export default function ImportDateRangeInput(props) {
             return response.json()
         }).then(data => {
             if (data.success) {
-                console.log("succeeded")
+                console.log("succeeded");
+                console.log(data);
+                window.localStorage.setItem("lastRequest", data.requestId);
+                window.location.href = "/request";
             } else {
                 if (data.reason === "strava-account-verification-failed") {
                     StravaAuth.redirectToAuth();

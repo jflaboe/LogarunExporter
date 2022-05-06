@@ -50,7 +50,7 @@ def create_request(request_data, strava_account):
         }
     }
     dynamo.update_item(
-        TableName='Users_LogarunToStrava',
+        TableName=os.environ["USERS_TABLE_NAME"],
         Key={
             'sid': {
                 'S': str(strava_account["athlete"]["id"])
@@ -76,12 +76,12 @@ def create_request(request_data, strava_account):
             }
         },
         ":b": {
-            "S": strava_account["athlete"]["id"]
+            "S": str(strava_account["athlete"]["id"])
         }
     }
     print(expression_attribute_values)
     dynamo.update_item(
-        TableName='Requests_LogarunToStrava',
+        TableName=os.environ["REQUESTS_TABLE_NAME"],
         Key={
             'rid': {
                 'S': req_id
@@ -103,6 +103,7 @@ def create_request(request_data, strava_account):
             "user": user,
             "pass": password
         })
+    return req_id
 
 def upload_to_sqs(obj):
     sqs.send_message(
