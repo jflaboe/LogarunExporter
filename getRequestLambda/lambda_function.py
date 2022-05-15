@@ -43,7 +43,7 @@ def lambda_handler(event, context):
     d = get_import_request(get_data(event))
 
     return {
-        "code": 200,
+        "statusCode": 200,
         "body": json.dumps({
             "success": True,
             "data": d

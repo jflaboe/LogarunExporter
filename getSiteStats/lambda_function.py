@@ -1,4 +1,3 @@
-from . import strava
 import json
 import boto3
 import os
@@ -6,19 +5,7 @@ import os
 dynamo = boto3.client("dynamodb")
 
 def lambda_handler(event, context):
-    request_data = get_request_data(event)
-    if not "sid" in request_data or request_data["sid"] is None:
-        try:
-            strava_account = get_strava_account(request_data)
-            print(strava_account)
-            strava_account_id = str(strava_account["athlete"]["id"])
-        except Exception as e:
-            print(e)
-
-    else:
-        strava_account_id = request_data["sid"] 
-            
-    user_data = get_user_data(strava_account_id)
+    site_data = get_site_data()
 
     return {
         "statusCode": 200,
@@ -57,18 +44,12 @@ def dynamo_to_dict(dynamo_response):
     
     return unmarshal(dynamo_response['Item'])
 
-def get_request_data(event):
-    return json.loads(event['body'])
-
-def get_strava_account(request_data):
-    return strava.get_strava_account(request_data['accessToken'])
-
 def get_user_data(user_id):
     resp = dynamo.get_item(
         TableName=os.environ["USERS_TABLE_NAME"],
         Key={
             'sid': {
-                'S': user_id
+                'S': "all"
             }
         }
     )

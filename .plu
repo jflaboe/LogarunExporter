@@ -1,1 +1,8 @@
-{"/import":"beginImportLambda", "/help":"helpLambda", "/request":"getRequestLambda", "/user":"getUserLambda"}
+{
+    "/import": "beginImportLambda",
+    "/help": "helpLambda",
+    "/request": "getRequestLambda",
+    "/user": "getUserLambda",
+    "~import~": "importToStrava",
+    "/stats": "getSiteStats"
+}

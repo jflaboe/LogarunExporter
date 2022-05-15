@@ -6,14 +6,13 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ImportDateRangeInput from './ImportDateRangeInput';
 import RequestStatus from './RequestStatus';
 import UserInfo from './UserInfo';
+import StravaLogin from './StravaLogin';
+import Menu from './Menu';
 
 function App() {
   
   useEffect(()=>{
     StravaAuth.loadAuthFromUrlParameters()
-    if (!StravaAuth.isAuthenticated()) {
-      StravaAuth.redirectToAuth()
-    }
   }, []);
   
   return (
@@ -33,6 +32,8 @@ function App() {
           <Route path="/" element={<ImportDateRangeInput />} />
         </Routes>
       </BrowserRouter>
+      <Menu />
+      <StravaLogin />
     </div>
   );
 }

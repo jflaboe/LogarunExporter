@@ -31,19 +31,24 @@ export default function ImportDateRangeInput(props) {
                 "defaultTitle": defaultTitle,
                 "useWatermark": useWatermark,
                 "accessToken": authData.code,
-                "tokenExpiryStart": authData.expiryStart
+                "tokenExpiryStart": authData.expiryStart,
+                "sid": window.localStorage.getItem("sid")
             })
         }).then(function(response) {
+            console.log("we got a response")
             if (!response.ok) {
                 console.log(response)
                 setLoadingImport(false)
             }
             return response.json()
         }).then(data => {
+            console.log("Import request succeeded")
+            console.log(data);
             if (data.success) {
                 console.log("succeeded");
                 console.log(data);
                 window.localStorage.setItem("lastRequest", data.requestId);
+                window.localStorage.setItem("sid", data.sid);
                 window.location.href = "/request";
             } else {
                 if (data.reason === "strava-account-verification-failed") {

@@ -19,35 +19,78 @@ def create_request(request_data, strava_account):
     dates = [dt.strftime("%m/%d/%Y") for dt in daterange(request_data["startDate"], request_data["endDate"])]
     req_id = id_generator()
     #create user level data
-    update_expression = "SET access_token = :a, refresh_token = :r, expires_at = :e, requests = list_append(if_not_exists(requests, :empty_list), :c)"
-    expression_attribute_values = {
-        ":c":{
-            "L": [{
+    try:
+        dynamo.update_item(
+            TableName=os.environ["USERS_TABLE_NAME"],
+            Key={
+                'sid': {
+                    'S': str(strava_account["athlete"]["id"])
+                }
+            },
+            UpdateExpression='SET #a = :value',
+            ConditionExpression='attribute_not_exists(#a)',
+            ExpressionAttributeValues={
+                ":value": {
+                    "M": {}
+                },
+            },
+            ExpressionAttributeNames={
+                '#a': 'requests'
+            }
+        )
+    except:
+        print("requests already exist")
+    if 'access_token' in strava_account:
+        update_expression = "SET access_token = :a, refresh_token = :r, expires_at = :e, requests.#rid = :c"
+        expression_attribute_values = {
+            ":c":{
                 "M": {
-                    "rid": {
-                        "S": req_id
-                    },
                     "start": {
                         "S": request_data["startDate"]
                     },
                     "end": {
                         "S": request_data["endDate"]
+                    },
+                    "days": {
+                        "N": str(len(dates))
+                    },
+                    "completed": {
+                        "N": "0"
                     }
                 }
-            }]
-        },
-        ":empty_list": {
-            "L" :[]
-        },
-        ":a": {
-            "S": strava_account['access_token']
-        },
-        ":r": {
-            "S": strava_account['refresh_token']
-        },
-        ":e": {
-            "N": str(strava_account["expires_at"])
+            },
+            ":a": {
+                "S": strava_account['access_token']
+            },
+            ":r": {
+                "S": strava_account['refresh_token']
+            },
+            ":e": {
+                "N": str(strava_account["expires_at"])
+            }
         }
+    else:
+        update_expression = "SET requests.#rid = :c"
+        expression_attribute_values = {
+            ":c":{
+                "M": {
+                    "start": {
+                        "S": request_data["startDate"]
+                    },
+                    "end": {
+                        "S": request_data["endDate"]
+                    },
+                    "days": {
+                        "N": str(len(dates))
+                    },
+                    "completed": {
+                        "N": "0"
+                    }
+                }
+            }
+        }
+    expression_attribute_names = {
+        "#rid": req_id
     }
     dynamo.update_item(
         TableName=os.environ["USERS_TABLE_NAME"],
@@ -57,7 +100,8 @@ def create_request(request_data, strava_account):
             }
         },
         UpdateExpression=update_expression,
-        ExpressionAttributeValues=expression_attribute_values)
+        ExpressionAttributeValues=expression_attribute_values,
+        ExpressionAttributeNames=expression_attribute_names)
     #create request
     update_expression = "SET dates = :c, sid = :b"
     expression_attribute_values = {
@@ -95,14 +139,23 @@ def create_request(request_data, strava_account):
     if not request_data['password'] == "":
         password = request_data["password"]
     user = request_data['username']
+    title = None
+    if request_data["useDefaultTitle"] is True:
+        title = request_data["defaultTitle"]
+    print("hey there")
+    print(request_data)
     for date in dates:
-        upload_to_sqs({
+
+        r = upload_to_sqs({
             "req_id": req_id,
             "date": date,
             "sid": str(strava_account["athlete"]["id"]),
             "user": user,
-            "pass": password
+            "pass": password,
+            "title": title,
+            "wm": request_data["useWatermark"]
         })
+        
     return req_id
 
 def upload_to_sqs(obj):
@@ -115,7 +168,7 @@ def upload_to_sqs(obj):
 def daterange(start_date, end_date):
     start_date = datetime.strptime(start_date, "%m/%d/%Y")
     end_date = datetime.strptime(end_date, "%m/%d/%Y")
-    for n in range(int ((end_date - start_date).days)):
+    for n in range(int ((end_date - start_date).days) + 1):
         yield start_date + timedelta(n)
 
 def get_request_data(event):
@@ -146,7 +199,7 @@ def lambda_handler(event, context):
 
     if verify_logarun_account(request_data) is False:
         return {
-            "code": 200,
+            "statusCode": 200,
             "body": json.dumps({
                 "success": False,
                 "reason": "logarun-account-verification-failed"
@@ -157,28 +210,37 @@ def lambda_handler(event, context):
                 "Access-Control-Allow-Origin": "*"
             }
         }
-    strava_account = check_for_account(request_data)
-    if strava_account is None:
-        strava_account = get_strava_account(request_data)
-    print("STRAVA ACCOUNT {}".format(strava_account))
-    if strava_account is None or not 'access_token' in strava_account:
-        return {
-            "code": 200,
-            "body": json.dumps({
-                "success": False,
-                "reason": "strava-account-verification-failed"
-            }),
-            "headers": {
-                "Access-Control-Allow-Methods": "*",
-                "Access-Control-Allow-Headers": "*",
-                "Access-Control-Allow-Origin": "*"
+    if not "sid" in request_data or request_data["sid"] is None:
+        strava_account = check_for_account(request_data)
+        if strava_account is None:
+            strava_account = get_strava_account(request_data)
+        print("STRAVA ACCOUNT {}".format(strava_account))
+
+        
+        if strava_account is None or not 'access_token' in strava_account:
+            return {
+                "statusCode": 200,
+                "body": json.dumps({
+                    "success": False,
+                    "reason": "strava-account-verification-failed"
+                }),
+                "headers": {
+                    "Access-Control-Allow-Methods": "*",
+                    "Access-Control-Allow-Headers": "*",
+                    "Access-Control-Allow-Origin": "*"
+                }
+            }
+    else:
+        strava_account = {
+            "athlete": {
+                "id": request_data["sid"]
             }
         }
     
     request_id = create_request(request_data, strava_account)
 
     return {
-        "code": 200,
+        "statusCode": 200,
         "body": json.dumps({
             "success": True,
             "requestId": request_id,

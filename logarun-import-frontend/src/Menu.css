@@ -1,0 +1,35 @@
+.menu-button { 
+    padding-top: 0.5vh;
+    padding-bottom: 0.5vh;
+    padding-right: 0.25vw;
+    padding-left: 0.25vw;
+    border: 1px solid black;
+    border-radius: 1vw;
+    align-self: flex-start;
+}
+
+.menu-button:hover {
+    background-color: #697E47;
+}
+.menu-link:hover {
+    background-color: #697E47;
+}
+
+.menu {
+    position: absolute;
+    left: 0.5vw;
+    top: 5.5vh;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex-direction: column;
+}
+
+.menu-close {
+    display: hidden;
+}
+
+.menu-links {
+    background-color: rgb(255,255,255);
+    border: 1px solid black;
+}

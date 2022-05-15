@@ -9,7 +9,8 @@ export default function UserInfo(props) {
         fetch(process.env.REACT_APP_USER_URL, {
             method: "POST",
             body: JSON.stringify({
-                "accessToken": authData.code
+                "accessToken": authData.code,
+                "sid": window.localStorage.getItem("sid")
             })
         })
         .then(function(response) {
@@ -29,22 +30,28 @@ export default function UserInfo(props) {
     useEffect(() => {
         
         let cachedData = window.localStorage.getItem("userinfo");
-        if (cachedData) {
-            setUserInfo(JSON.parse(cachedData));
-            return;
-        }
         refresh();
     }, []);
 
     if (userInfo) {
         let requests = userInfo.requests;
         return (
-            <div>
-                {requests && requests.length > 0 && requests.map((request) => {
-                    return (
-                        <RequestSummary request={request} key={request.rid} />
-                    );
-                })}
+            <div className="user-info">
+                <div className="user-info-summary">
+                    <div>Activities Uploaded: {userInfo.activities}</div>
+                    <div>Miles Uploaded: {(userInfo.distance/1609).toFixed(2)}</div>
+                </div>
+                <div className="user-info-requests">
+                    <div className="user-info-requests-title">
+                        Your Requests:
+                    </div>
+                    {requests && Object.keys(requests).length > 0 && Object.keys(requests).map((requestId) => {
+                        return (
+                            <RequestSummary request={requests[requestId]} key={requestId} id={requestId} />
+                        );
+                    })}
+                </div>
+                
             </div>
         )
     }
@@ -55,9 +62,9 @@ export default function UserInfo(props) {
 
 function RequestSummary(props) {
     return (
-        <div className="request-summary" onClick={()=>{redirectToRequest(props.request.rid)}}>
+        <div className="request-summary logarun" onClick={()=>{redirectToRequest(props.id)}}>
             <div className="dates">{props.request.start + " to " + props.request.end}</div>
-            <div className="is-complete">{props.request.complete ? "Status: Complete" : "Status: In Progress"}</div>
+            <div className="is-complete">{props.request.completed >= props.request.days ? "Status: Complete" : "Status: In Progress"}</div>
         </div>
     )
 }
